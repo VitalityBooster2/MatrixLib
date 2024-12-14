@@ -51,15 +51,22 @@ public class Matrix<T> : ICloneable where T : INumber<T>
     public Matrix<TType> Cast<TType>() where TType : INumber<TType>
     {
         TType[,] temp = new TType[Size.RowCount,Size.ColCount];
-        for (int i = 0; i < Size.RowCount; i++)
+        TType n;
+        var flag = TType.TryParse(new ReadOnlySpan<char>(Values[0, 0].ToString().ToCharArray()),null, out n);
+        if (flag)
         {
-            for (int j = 0; j < Size.ColCount; j++)
+            for (int i = 0; i < Size.RowCount; i++)
             {
-                temp[i, j] = TType.Parse(new ReadOnlySpan<char>(Values[i, j].ToString().ToCharArray()),null);
-            }    
+                for (int j = 0; j < Size.ColCount; j++)
+                {
+                    temp[i, j] = TType.Parse(new ReadOnlySpan<char>(Values[i, j].ToString().ToCharArray()), null);
+                }
+            }
+            return new Matrix<TType>(temp);
         }
 
-        return new Matrix<TType>(temp);
+
+        throw new InvalidCastException($"Cannot cast {typeof(T).Name} to {typeof(TType).Name}");
     }
 
     private void RefreshMatrix()
