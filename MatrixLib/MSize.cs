@@ -30,9 +30,9 @@ public struct MSize(int rowCount, int colCount)
     }
     
     
-    public static bool operator !=(MSize m1, MSize m2) => !(m1 == m2);
+    public static bool operator != (MSize m1, MSize m2) => !(m1 == m2);
     
-    public static bool operator ==(MSize m1, MSize m2) => ((m1.RowCount == m2.RowCount) && (m1.ColCount == m2.ColCount));
+    public static bool operator == (MSize m1, MSize m2) => ((m1.RowCount == m2.RowCount) && (m1.ColCount == m2.ColCount));
 
     public override string ToString() => $"Row: {RowCount}, Col: {ColCount}";
 

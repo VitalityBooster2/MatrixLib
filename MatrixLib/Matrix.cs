@@ -46,9 +46,21 @@ public class Matrix<T> : ICloneable where T : INumber<T>
     public Matrix(T[,] values) : this(values.GetLength(0), values.GetLength(1))
     {
         Values = values;
-        
     }
 
+    public Matrix<TType> Cast<TType>() where TType : INumber<TType>
+    {
+        TType[,] temp = new TType[Size.RowCount,Size.ColCount];
+        for (int i = 0; i < Size.RowCount; i++)
+        {
+            for (int j = 0; j < Size.ColCount; j++)
+            {
+                temp[i, j] = TType.Parse(new ReadOnlySpan<char>(Values[i, j].ToString().ToCharArray()),null);
+            }    
+        }
+
+        return new Matrix<TType>(temp);
+    }
 
     private void RefreshMatrix()
     {
@@ -57,8 +69,25 @@ public class Matrix<T> : ICloneable where T : INumber<T>
         Cols = Enumerable.Range(0, Size.ColCount)
             .Select(i => Enumerable.Range(0, Size.RowCount).Select(j => this[j, i]).ToArray()).ToArray();
     }
+    
+    
+    public void Transporate()
+    {
+        var temp = new T[Size.ColCount,Size.RowCount];
+        
+        
+        for (int i = 0; i < Size.RowCount; i++)
+        {
+            for (int j = 0; j < Size.ColCount; j++)
+            {
+                temp[j, i] = Values[i, j];
+            }
+        }
 
-
+        Size = new MSize(Size.ColCount, Size.RowCount);
+        Values = temp;
+    }
+    
     private static Matrix<T> HandleSameSizeMatrix(Matrix<T> left, Matrix<T> right, Func<T, T, T> func)
     {
         Matrix<T> result = new Matrix<T>(left.Size);
@@ -77,7 +106,8 @@ public class Matrix<T> : ICloneable where T : INumber<T>
 
         throw new MatrixSizeException();
     }
-
+    
+    
     public static Matrix<T> operator *(Matrix<T> m, T value)
     {
         var temp = new Matrix<T>(m.Size);
@@ -137,6 +167,7 @@ public class Matrix<T> : ICloneable where T : INumber<T>
         return sb.ToString();
     }
 
+    
     public object Clone()
     {
         var temp = new Matrix<T>(Size);
